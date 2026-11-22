@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>K&J Ink — Late-Night Stories & VIP Reading Club</title>
+  <!-- Google Fonts: Inter & Playfair Display -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Playfair Display', 'serif'],
+          },
+          colors: {
+            obsidian: {
+              950: '#09080c',
+              900: '#121017',
+              800: '#1b1823',
+              700: '#262232',
+            },
+            amberGlow: {
+              300: '#fcd34d',
+              400: '#fbbf24',
+              500: '#f59e0b',
+              600: '#d97706',
+            },
+            roseGold: {
+              300: '#fda4af',
+              400: '#fb7185',
+              500: '#f43f5e',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #09080c; }
+    ::-webkit-scrollbar-thumb { background: #262232; border-radius: 9999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #f59e0b; }
+    .glass-panel {
+      background: rgba(27, 24, 35, 0.78);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .book-shadow {
+      box-shadow: 0 20px 35px -10px rgba(0, 0, 0, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.15);
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-obsidian-950 text-stone-100 font-sans antialiased min-h-screen flex flex-col selection:bg-amberGlow-500/30 selection:text-amberGlow-300">
+
+  <!-- Toast Notification Container (Replaces alert()) -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 left-5 sm:left-auto z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- ========================================================= -->
+  <!-- TOP 7-DAY FREE TRIAL & DEMO SIMULATOR BAR                 -->
+  <!-- ========================================================= -->
+  <div id="trialStatusBar" class="bg-gradient-to-r from-obsidian-900 via-obsidian-800 to-obsidian-900 border-b border-amberGlow-400/25 px-4 py-2.5 text-xs">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div class="flex items-center gap-2 text-center sm:text-left">
+        <span id="trialBadgeIcon" class="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold">✦</span>
+        <span id="trialBannerText" class="text-stone-200 font-medium">
+          Welcome! Enjoy <strong class="text-amberGlow-300">7 Days Free Reading</strong> — all full stories unlocked!
+        </span>
+      </div>
+
+      <!-- Interactive Demo Controls so Joana can test Reader Experience -->
+      <div class="flex items-center gap-2 shrink-0">
+        <button id="btnToggleDay8" onclick="toggleTrialSimulation()" class="px-3 py-1 rounded-full bg-white/10 hover:bg-white/15 border border-white/15 text-[11px] font-semibold text-amberGlow-300 transition">
+          Simulate Day 8 (Trial Ended)
+        </button>
+        <button onclick="openSubscriptionModal()" class="px-3 py-1 rounded-full bg-amberGlow-400 hover:bg-amberGlow-300 text-obsidian-950 text-[11px] font-bold transition">
+          VIP Pass
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MAIN NAVIGATION HEADER (CLEAN FOR VISITORS)               -->
+  <!-- ========================================================= -->
+  <header class="sticky top-0 z-40 glass-panel border-b border-white/10">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-3">
+      <!-- Brand Identity (Subtle K & J Monogram) -->
+      <a href="#" onclick="switchToStorefront(event)" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amberGlow-400 via-roseGold-400 to-purple-600 flex items-center justify-center shadow-lg shadow-amberGlow-500/20 group-hover:scale-105 transition">
+          <span class="font-serif font-bold text-sm tracking-tighter text-obsidian-950">K&amp;J</span>
+        </div>
+        <div>
+          <h1 class="font-serif text-lg sm:text-xl font-bold tracking-tight text-white leading-none">
+            K&amp;J <span class="text-amberGlow-400">Ink</span>
+          </h1>
+          <p class="text-[11px] text-stone-400 mt-0.5">Midnight Chapters &amp; Secret Worlds</p>
+        </div>
+      </a>
+
+      <!-- Right Action Buttons -->
+      <div class="flex items-center gap-2.5">
+        <!-- Owner Mode Badge (ONLY visible AFTER Joana logs in with PIN) -->
+        <button id="ownerStudioHeaderBtn" onclick="toggleOwnerStudio()" class="hidden px-3.5 py-2 rounded-xl bg-roseGold-500/20 hover:bg-roseGold-500/30 border border-roseGold-400/40 text-roseGold-300 text-xs font-semibold flex items-center gap-1.5 transition">
+          <span class="w-2 h-2 rounded-full bg-roseGold-400 animate-pulse"></span>
+          <span id="ownerStudioHeaderLabel">Owner Studio</span>
+        </button>
+
+        <!-- Reader Membership / Subscribe Button -->
+        <button id="headerSubBtn" onclick="openSubscriptionModal()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-amberGlow-400 to-roseGold-400 hover:opacity-95 text-obsidian-950 font-bold text-xs sm:text-sm shadow-lg shadow-amberGlow-500/15 transition">
+          Join VIP • <span id="headerPriceTag">2,000 RWF/mo</span>
+        </button>
+
+        <!-- Help / Demo Tour Trigger -->
+        <button onclick="openQuickGuideModal()" title="Owner & Demo Guide" class="p-2 rounded-xl bg-obsidian-800 hover:bg-obsidian-700 border border-white/10 text-stone-300 text-xs font-bold">
+          ?
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========================================================= -->
+  <!-- MAIN CONTENT AREA                                         -->
+  <!-- ========================================================= -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-10">
+
+    <!-- ======================================================= -->
+    <!-- VIEW 1: READER STOREFRONT (PUBLIC EXPERIENCE)           -->
+    <!-- ======================================================= -->
+    <section id="readerView" class="space-y-8">
+      <!-- Hero Section -->
+      <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-obsidian-800 via-obsidian-900 to-obsidian-950 border border-white/10 p-6 sm:p-10">
+        <div class="absolute -top-24 -right-24 w-80 h-80 bg-amberGlow-500/15 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -left-24 w-80 h-80 bg-roseGold-500/15 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+          <div class="max-w-2xl space-y-4">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amberGlow-400/10 border border-amberGlow-400/25 text-amberGlow-300 text-xs font-medium">
+              <span>✨ Original Fiction • New Chapters Weekly</span>
+            </div>
+            <h2 class="font-serif text-3xl sm:text-4xl md:text-5xl font-bold text-white leading-tight">
+              Stories written after midnight, made for your heart.
+            </h2>
+            <p class="text-stone-300 text-sm sm:text-base leading-relaxed">
+              Start reading every story completely free during your <span id="heroTrialDaysText" class="text-amberGlow-300 font-semibold">7-Day Welcome Pass</span>. Hooked on the drama? Stay subscribed for unlimited access to every new release.
+            </p>
+            <div class="pt-2 flex flex-wrap items-center gap-3">
+              <a href="#storiesSection" class="px-5 py-2.5 rounded-xl bg-amberGlow-400 hover:bg-amberGlow-300 text-obsidian-950 font-semibold text-sm transition shadow-lg shadow-amberGlow-500/20">
+                Start Reading Free
+              </a>
+              <button onclick="shareSiteLink()" class="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-stone-200 font-medium text-sm transition flex items-center gap-2">
+                <span>Share with Friends</span>
+                <svg class="w-4 h-4 text-amberGlow-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- VIP Membership Card Preview -->
+          <div class="lg:w-80 shrink-0 rounded-2xl bg-obsidian-950/80 border border-amberGlow-400/30 p-5 space-y-3 shadow-xl">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-amberGlow-400">All-Access Reader Club</span>
+              <span id="cardAccessStatusBadge" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300">Trial Active</span>
+            </div>
+            <div class="flex items-baseline gap-1">
+              <span id="heroCardPrice" class="text-3xl font-bold text-white">2,000 RWF</span>
+              <span class="text-xs text-stone-400">/ month</span>
+            </div>
+            <ul class="text-xs text-stone-300 space-y-1.5 pt-1">
+              <li class="flex items-center gap-2"><span class="text-amberGlow-400">✓</span> First <span id="cardTrialDays">7</span> days 100% free</li>
+              <li class="flex items-center gap-2"><span class="text-amberGlow-400">✓</span> Unlimited access to every story</li>
+              <li class="flex items-center gap-2"><span class="text-amberGlow-400">✓</span> New stories added every week</li>
+            </ul>
+            <button onclick="openSubscriptionModal()" class="w-full py-2.5 rounded-xl bg-white/10 hover:bg-amberGlow-400 hover:text-obsidian-950 text-white font-semibold text-xs transition">
+              Manage / Subscribe Now
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Genre Filter & Search -->
+      <div id="storiesSection" class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div class="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar" id="genrePills"></div>
+        <div class="relative w-full sm:w-64">
+          <input type="text" id="searchInput" oninput="renderStorefront()" placeholder="Search K&J Ink stories..." class="w-full pl-9 pr-4 py-2 rounded-xl bg-obsidian-900 border border-white/10 text-sm text-white placeholder-stone-500 focus:outline-none focus:border-amberGlow-400 transition" />
+          <svg class="w-4 h-4 text-stone-500 absolute left-3 top-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+          </svg>
+        </div>
+      </div>
+
+      <!-- Story Cards Grid -->
+      <div id="storiesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </section>
+
+    <!-- ======================================================= -->
+    <!-- VIEW 2: OWNER STUDIO (HIDDEN UNTIL PIN UNLOCKED)        -->
+    <!-- ======================================================= -->
+    <section id="authorView" class="hidden space-y-8">
+      <!-- Top Studio Header (Private to Owner) -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-obsidian-900 to-obsidian-800 border border-roseGold-400/25 rounded-3xl p-6">
+        <div>
+          <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-roseGold-300">
+            <span>👑 Private Owner Mode • KWIZERA Joana</span>
+          </div>
+          <h2 class="font-serif text-2xl sm:text-3xl font-bold text-white mt-1">K&amp;J Ink Control Room</h2>
+          <p class="text-stone-400 text-sm mt-1">Upload stories, change your monthly subscription price anytime, and share viral links.</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-2.5">
+          <button onclick="openEditorModal()" class="px-5 py-3 rounded-xl bg-gradient-to-r from-amberGlow-400 to-roseGold-400 hover:opacity-95 text-obsidian-950 font-bold text-sm shadow-lg flex items-center gap-2 transition">
+            <span>+ Write New Story</span>
+          </button>
+          <button onclick="lockOwnerStudio()" class="px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs text-stone-300 font-medium">
+            Lock & Exit Admin
+          </button>
+        </div>
+      </div>
+
+      <!-- STUDIO GRID: SUBSCRIPTION PRICING CONTROL + GROW FAMOUS TOOLKIT -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- CARD A: ADJUST SUBSCRIPTION PRICE & TRIAL SETTINGS ANYTIME -->
+        <div class="bg-obsidian-900 border border-white/10 rounded-3xl p-6 space-y-5">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="font-serif text-xl font-bold text-white">Subscription Price & Trial</h3>
+              <p class="text-xs text-stone-400 mt-0.5">Change what readers pay monthly—updates the site instantly.</p>
+            </div>
+            <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-300">Live Control</span>
+          </div>
+
+          <form onsubmit="savePricingSettings(event)" class="space-y-4">
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-medium text-stone-300 mb-1">Monthly Price</label>
+                <input type="number" id="settingSubPrice" required min="0" step="50" class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian-950 border border-white/15 text-sm text-white font-bold focus:outline-none focus:border-amberGlow-400" />
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-stone-300 mb-1">Currency</label>
+                <select id="settingCurrency" class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian-950 border border-white/15 text-sm text-white focus:outline-none focus:border-amberGlow-400">
+                  <option value="RWF">RWF (Rwandan Francs)</option>
+                  <option value="USD">USD ($ US Dollars)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-medium text-stone-300 mb-1">Free Trial Days</label>
+                <input type="number" id="settingTrialDays" required min="1" max="30" class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian-950 border border-white/15 text-sm text-white focus:outline-none focus:border-amberGlow-400" />
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-stone-300 mb-1">Your Owner PIN</label>
+                <input type="text" id="settingOwnerPin" required maxlength="8" class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian-950 border border-white/15 text-sm text-white focus:outline-none focus:border-amberGlow-400" />
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-medium text-stone-300 mb-1">Real Payment Link (Selar / Flutterwave / MoMo Pay URL — Optional)</label>
+              <input type="url" id="settingPaymentUrl" placeholder="https://selar.co/kj-ink-vip" class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian-950 border border-white/15 text-xs text-white focus:outline-none focus:border-amberGlow-400" />
+              <p class="text-[11px] text-stone-500 mt-1">If pasted, clicking "Subscribe" will open your real payment page!</p>
+            </div>
+
+            <button type="submit" class="w-full py-3 rounded-xl bg-amberGlow-400 hover:bg-amberGlow-300 text-obsidian-950 font-bold text-sm transition">
+              Save & Update Subscription Price
+            </button>
+          </form>
+        </div>
+
+        <!-- CARD B: "GROW FAMOUS" VIRAL SOCIAL TOOLKIT -->
+        <div class="bg-obsidian-900 border border-white/10 rounded-3xl p-6 space-y-5 flex flex-col justify-between">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="font-serif text-xl font-bold text-white">Grow Famous Toolkit 🚀</h3>
+                <p class="text-xs text-stone-400 mt-0.5">Turn TikTok, Instagram & WhatsApp views into loyal subscribers.</p>
+              </div>
+            </div>
+
+            <!-- Bio Link Copier -->
+            <div class="p-3.5 rounded-2xl bg-obsidian-950 border border-white/10 space-y-2">
+              <label class="block text-[11px] font-semibold uppercase tracking-wider text-amberGlow-400">1. Copy Link for TikTok & Instagram Bio</label>
+              <div class="flex items-center gap-2">
+                <input type="text" id="bioLinkPreview" readonly value="https://kj-ink.tiiny.site" class="flex-1 bg-transparent text-xs text-stone-300 focus:outline-none truncate" />
+                <button type="button" onclick="copyTextValue('bioLinkPreview', 'Bio link copied! Paste it in your TikTok & IG bio.')" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-xs font-semibold text-white shrink-0">
+                  Copy Link
+                </button>
+              </div>
+            </div>
+
+            <!-- Viral Caption Generator -->
+            <div class="p-3.5 rounded-2xl bg-obsidian-950 border border-white/10 space-y-2">
+              <div class="flex items-center justify-between">
+                <label class="block text-[11px] font-semibold uppercase tracking-wider text-roseGold-300">2. TikTok / WhatsApp Hook Caption</label>
+                <button type="button" onclick="generatePromoCaption()" class="text-[11px] text-amberGlow-300 hover:underline">New Hook ↻</button>
+              </div>
+              <textarea id="promoCaptionBox" rows="3" readonly class="w-full bg-transparent text-xs text-stone-200 leading-relaxed focus:outline-none resize-none"></textarea>
+              <div class="flex items-center gap-2 pt-1">
+                <button type="button" onclick="copyTextValue('promoCaptionBox', 'Caption copied! Ready to post on TikTok or WhatsApp.')" class="flex-1 py-2 rounded-lg bg-roseGold-500/20 hover:bg-roseGold-500/30 border border-roseGold-400/30 text-roseGold-200 text-xs font-semibold">
+                  Copy Caption
+                </button>
+                <button type="button" onclick="shareToWhatsApp()" class="flex-1 py-2 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-400/30 text-emerald-200 text-xs font-semibold">
+                  Share on WhatsApp
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Export Standalone HTML Button -->
+          <div class="pt-2 border-t border-white/10 flex items-center justify-between gap-3">
+            <p class="text-[11px] text-stone-400">Finished writing new stories? Download your updated file to upload online.</p>
+            <button type="button" onclick="exportUpdatedWebsite()" class="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-xs font-semibold text-white shrink-0">
+              Download Site (.html)
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MANAGE JOANA'S STORIES LIST -->
+      <div class="bg-obsidian-900 border border-white/10 rounded-3xl overflow-hidden">
+        <div class="px-6 py-4 border-b border-white/10 flex items-center justify-between">
+          <div>
+            <h3 class="font-semibold text-white">Your Published Stories (<span id="ownerStoryCount">0</span>)</h3>
+            <p class="text-xs text-stone-400">Readers get 7 days free, then pay <span id="ownerPriceReminder" class="text-amberGlow-400 font-semibold">2,000 RWF/mo</span> to keep reading.</p>
+          </div>
+          <button onclick="openEditorModal()" class="px-4 py-2 rounded-xl bg-amberGlow-400 text-obsidian-950 font-bold text-xs">
+            + Add Story
+          </button>
+        </div>
+        <div id="authorStoriesList" class="divide-y divide-white/10"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================= -->
+  <!-- FOOTER WITH DISCREET OWNER LOGIN LOCK                     -->
+  <!-- ========================================================= -->
+  <footer class="border-t border-white/10 py-6 px-4 text-xs text-stone-500">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+      <p>© 2026 K&amp;J Ink • Original Fiction &amp; Late-Night Reads</p>
+      <div class="flex items-center gap-4">
+        <button onclick="openSubscriptionModal()" class="hover:text-amberGlow-300 transition">VIP Membership</button>
+        <button onclick="openOwnerLoginModal()" class="inline-flex items-center gap-1.5 text-stone-500 hover:text-stone-300 transition">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+          </svg>
+          <span>Author Login</span>
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 1: OWNER QUICK-GUIDE MODAL (ON FIRST LOAD)          -->
+  <!-- ========================================================= -->
+  <div id="quickGuideModal" class="fixed inset-0 z-50 hidden bg-obsidian-950/85 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-obsidian-900 border border-amberGlow-400/30 rounded-3xl w-full max-w-lg p-6 sm:p-8 space-y-5 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <span class="px-3 py-1 rounded-full text-xs font-bold bg-amberGlow-400/15 text-amberGlow-300">Welcome to K&amp;J Ink ✨</span>
+        <button onclick="closeQuickGuideModal()" class="text-stone-400 hover:text-white text-sm">✕</button>
+      </div>
+      <h3 class="font-serif text-2xl font-bold text-white">Your Private Brand, Ready to Go Viral</h3>
+      <div class="space-y-3 text-xs sm:text-sm text-stone-300 leading-relaxed">
+        <div class="p-3 rounded-2xl bg-obsidian-950 border border-white/10">
+          <p class="font-semibold text-amberGlow-300">1. Anonymous &amp; Aesthetic Identity</p>
+          <p class="text-stone-400 mt-0.5">Your public brand is <strong class="text-white">K&amp;J Ink</strong>—using your initials without revealing your full name to strangers.</p>
+        </div>
+        <div class="p-3 rounded-2xl bg-obsidian-950 border border-white/10">
+          <p class="font-semibold text-roseGold-300">2. Secret Owner Studio (PIN: 2008)</p>
+          <p class="text-stone-400 mt-0.5">Scroll to the footer and tap <strong class="text-white">"Author Login"</strong> with PIN <span class="px-2 py-0.5 rounded bg-amberGlow-400/20 text-amberGlow-300 font-mono font-bold">2008</span> to adjust your monthly price, upload stories, and copy viral hooks.</p>
+        </div>
+        <div class="p-3 rounded-2xl bg-obsidian-950 border border-white/10">
+          <p class="font-semibold text-emerald-300">3. Test the 7-Day Free Hook</p>
+          <p class="text-stone-400 mt-0.5">Tap <strong class="text-white">"Simulate Day 8 (Trial Ended)"</strong> in the top bar anytime to preview how visitors see the monthly paywall after week one.</p>
+        </div>
+      </div>
+      <button onclick="closeQuickGuideModal()" class="w-full py-3 rounded-xl bg-gradient-to-r from-amberGlow-400 to-roseGold-400 text-obsidian-950 font-bold text-sm">
+        Got It — Explore K&amp;J Ink!
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 2: SECRET OWNER PIN LOGIN MODAL                     -->
+  <!-- ========================================================= -->
+  <div id="ownerLoginModal" class="fixed inset-0 z-50 hidden bg-obsidian-950/90 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-obsidian-900 border border-white/15 rounded-3xl w-full max-w-sm p-6 space-y-5 shadow-2xl text-center">
+      <div class="w-12 h-12 rounded-2xl bg-roseGold-500/15 text-roseGold-300 flex items-center justify-center mx-auto">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+        </svg>
+      </div>
+      <div>
+        <h3 class="font-serif text-xl font-bold text-white">K&amp;J Ink Author Login</h3>
+        <p class="text-xs text-stone-400 mt-1">Enter your secret owner PIN to manage stories &amp; pricing.</p>
+      </div>
+      <h3 class="font-serif text-2xl font-bold text-white">How Your Story Website Works</h3>
+      <div class="space-y-3 text-xs sm:text-sm text-stone-300 leading-relaxed">
+        <div class="p-3 rounded-2xl bg-obsidian-950 border border-white/10">
+          <p class="font-semibold text-amberGlow-300">1. Test the Reader Experience (7-Day Free Hook)</p>
+          <p class="text-stone-400 mt-0.5">Right now, all stories are unlocked as if you're a new visitor on Day 1. Tap <strong class="text-white">"Simulate Day 8 (Trial Ended)"</strong> in the top bar to see the monthly paywall appear!</p>
+        </div>
+        <div class="p-3 rounded-2xl bg-obsidian-950 border border-white/10">
+          <p class="font-semibold text-roseGold-300">2. Enter as Owner (Secret PIN)</p>
+          <p class="text-stone-400 mt-0.5">Visitors don't see your admin tools. Scroll to the bottom footer and tap <strong class="text-white">"Author Login"</strong>, then enter your default PIN: <span class="px-2 py-0.5 rounded bg-amberGlow-400/20 text-amberGlow-300 font-mono font-bold">2008</span></p>
+        </div>
+        <div class="p-3 rounded-2xl bg-obsidian-950 border border-white/10">
+          <p class="font-semibold text-emerald-300">3. Change Price & Upload Stories Anytime</p>
+          <p class="text-stone-400 mt-0.5">Inside your Owner Studio, you can change the monthly price anytime, write new stories, and copy viral TikTok/WhatsApp hooks.</p>
+        </div>
+      </div>
+      <button onclick="closeQuickGuideModal()" class="w-full py-3 rounded-xl bg-gradient-to-r from-amberGlow-400 to-roseGold-400 text-obsidian-950 font-bold text-sm">
+        Got It — Explore My Site!
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 2: SECRET OWNER PIN LOGIN MODAL                     -->
+  <!-- ========================================================= -->
+  <div id="ownerLoginModal" class="fixed inset-0 z-50 hidden bg-obsidian-950/90 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="bg-obsidian-900 border border-white/15 rounded-3xl w-full max-w-sm p-6 space-y-5 shadow-2xl text-center">
+      <div class="w-12 h-12 rounded-2xl bg-roseGold-500/15 text-roseGold-300 flex items-center justify-center mx-auto">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+        </svg>
+      </div>
+      <div>
+        <h3 class="font-serif text-xl font-bold text-white">KWIZERA Joana Login</h3>
+        <p class="text-xs text-stone-400 mt-1">Enter your secret owner PIN to manage stories & pricing.</p>
+      </div>
+      <form onsubmit="verifyOwnerPin(event)" class="space-y-4">
+        <input type="password" id="ownerPinInput" inputmode="numeric" required placeholder="Enter PIN (Default: 2008)" class="w-full px-4 py-3 rounded-xl bg-obsidian-950 border border-white/15 text-center text-lg tracking-widest text-white font-bold focus:outline-none focus:border-amberGlow-400" />
+        <div class="flex gap-2">
+          <button type="button" onclick="closeOwnerLoginModal()" class="flex-1 py-2.5 rounded-xl bg-white/5 text-xs text-stone-300">Cancel</button>
+          <button type="submit" class="flex-1 py-2.5 rounded-xl bg-amberGlow-400 text-obsidian-950 font-bold text-xs">Unlock Studio</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 3: READER STORY MODAL (TRIAL OR VIP PAYWALL)        -->
+  <!-- ========================================================= -->
+  <div id="readerModal" class="fixed inset-0 z-50 hidden bg-obsidian-950/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-6">
+    <div class="bg-obsidian-900 border border-white/15 rounded-3xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="px-5 py-4 border-b border-white/10 flex items-center justify-between bg-obsidian-900">
+        <div class="flex items-center gap-2">
+          <span id="readerGenreBadge" class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amberGlow-400/15 text-amberGlow-300">Genre</span>
+          <span id="readerAccessBadge" class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/20 text-emerald-300">Free Trial Full Access</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="toggleReaderPaper()" class="px-2.5 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-xs text-stone-300 border border-white/10">
+            Aa Theme
+          </button>
+          <button onclick="closeReaderModal()" class="p-1.5 rounded-lg bg-white/5 hover:bg-white/15 text-stone-300">✕</button>
+        </div>
+      </div>
+
+      <div id="readerBodyContainer" class="p-6 sm:p-10 overflow-y-auto space-y-6 transition-colors duration-300 bg-obsidian-900 text-stone-200">
+        <div class="space-y-2 border-b border-current/10 pb-5">
+          <h2 id="readerTitle" class="font-serif text-2xl sm:text-3xl font-bold leading-snug">Story Title</h2>
+          <p id="readerMeta" class="text-xs opacity-70">Original Story • K&amp;J Ink</p>
+        </div>
+
+        <div id="readerText" class="font-serif text-base sm:text-lg leading-relaxed space-y-4 whitespace-pre-line"></div>
+
+        <!-- Subscription Paywall (Shown on Day 8+ if not subscribed) -->
+        <div id="readerPaywallBox" class="hidden mt-8 p-6 rounded-2xl bg-gradient-to-br from-obsidian-800 to-obsidian-950 border border-amberGlow-400/40 text-stone-100 text-center space-y-4 shadow-xl">
+          <div class="w-12 h-12 rounded-full bg-amberGlow-400/15 text-amberGlow-400 flex items-center justify-center mx-auto text-xl">
+            ✨
+          </div>
+          <div>
+            <span class="text-[11px] uppercase tracking-wider text-amberGlow-300 font-bold">Your 7-Day Free Trial Has Ended</span>
+            <h4 class="font-serif text-xl sm:text-2xl font-bold text-white mt-1">Keep reading on K&amp;J Ink!</h4>
+            <p class="text-xs sm:text-sm text-stone-300 mt-1.5 max-w-md mx-auto">
+              Join the Monthly VIP Reader Club to unlock the rest of this story and every new chapter released this month.
+            </p>
+          </div>
+          <button onclick="closeReaderModal(); openSubscriptionModal();" class="w-full sm:w-auto px-7 py-3.5 rounded-xl bg-gradient-to-r from-amberGlow-400 to-roseGold-400 text-obsidian-950 font-bold text-sm shadow-lg transition">
+            Subscribe Now • <span id="paywallPriceLabel">2,000 RWF / month</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 4: MONTHLY VIP SUBSCRIPTION CHECKOUT MODAL          -->
+  <!-- ========================================================= -->
+  <div id="subscriptionModal" class="fixed inset-0 z-50 hidden bg-obsidian-950/90 backdrop-blur-md flex items-end sm:items-center justify-center p-0 sm:p-4">
+    <div class="bg-obsidian-900 border border-white/15 rounded-t-3xl sm:rounded-3xl w-full max-w-md p-6 space-y-5 shadow-2xl">
+      <div class="flex items-center justify-between">
+        <div>
+          <span class="text-[11px] font-bold uppercase tracking-wider text-amberGlow-400">K&amp;J Ink VIP Pass</span>
+          <h3 class="font-serif text-xl font-bold text-white">Unlimited Monthly Reading</h3>
+        </div>
+        <button onclick="closeSubscriptionModal()" class="p-1.5 rounded-lg bg-white/5 text-stone-300">✕</button>
+      </div>
+
+      <div class="p-4 rounded-2xl bg-obsidian-950 border border-amberGlow-400/30 flex items-center justify-between">
+        <div>
+          <p class="text-xs text-stone-400">Monthly Subscription</p>
+          <p id="modalSubPriceDisplay" class="text-2xl font-bold text-white">2,000 RWF <span class="text-xs font-normal text-stone-400">/ month</span></p>
+        </div>
+        <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-500/15 text-emerald-300">All Stories</span>
+      </div>
+
+      <!-- Payment Method Tabs -->
+      <div class="space-y-3">
+        <label class="block text-xs font-semibold text-stone-400">Select Payment Method</label>
+        <div class="grid grid-cols-3 gap-2">
+          <button type="button" onclick="selectSubPayMethod('mtn')" id="subPay-mtn" class="sub-pay-btn p-2.5 rounded-xl border border-amberGlow-400 bg-amberGlow-400/10 text-center">
+            <span class="block text-xs font-bold text-amberGlow-300">MTN MoMo</span>
+          </button>
+          <button type="button" onclick="selectSubPayMethod('airtel')" id="subPay-airtel" class="sub-pay-btn p-2.5 rounded-xl border border-white/10 bg-obsidian-800 text-center">
+            <span class="block text-xs font-bold text-roseGold-300">Airtel Money</span>
+          </button>
+          <button type="button" onclick="selectSubPayMethod('card')" id="subPay-card" class="sub-pay-btn p-2.5 rounded-xl border border-white/10 bg-obsidian-800 text-center">
+            <span class="block text-xs font-bold text-sky-300">Visa / Card</span>
+          </button>
+        </div>
+
+        <div>
+          <label id="subPayLabel" class="block text-xs text-stone-300 mb-1">MTN Mobile Money Number</label>
+          <input type="text" id="subPayInput" placeholder="e.g., 0788 123 456" class="w-full px-4 py-2.5 rounded-xl bg-obsidian-950 border border-white/15 text-sm text-white focus:outline-none focus:border-amberGlow-400" />
+        </div>
+      </div>
+
+      <div class="space-y-2 pt-1">
+        <button onclick="activateMonthlySubscription()" id="confirmSubBtn" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-amberGlow-400 to-roseGold-400 text-obsidian-950 font-bold text-sm shadow-lg">
+          Activate Monthly VIP Subscription
+        </button>
+        <a id="externalPaymentLinkBtn" href="#" target="_blank" class="hidden w-full py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-center block text-xs font-semibold text-amberGlow-300">
+          Pay via Official K&amp;J Ink Checkout ↗
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- MODAL 5: WRITE / EDIT STORY MODAL (OWNER ONLY)            -->
+  <!-- ========================================================= -->
+  <div id="editorModal" class="fixed inset-0 z-50 hidden bg-obsidian-950/90 backdrop-blur-md flex items-center justify-center p-3 sm:p-6">
+    <div class="bg-obsidian-900 border border-white/15 rounded-3xl w-full max-w-2xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden">
+      <div class="px-6 py-4 border-b border-white/10 flex items-center justify-between">
+        <h3 id="editorModalTitle" class="font-serif text-xl font-bold text-white">Write a New Story</h3>
+        <button onclick="closeEditorModal()" class="p-1.5 rounded-lg bg-white/5 text-stone-300">✕</button>
+      </div>
+
+      <form id="storyForm" onsubmit="saveStory(event)" class="p-6 overflow-y-auto space-y-4">
+        <input type="hidden" id="editStoryId" />
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-medium text-stone-300 mb-1">Story Title *</label>
+            <input type="text" id="fieldTitle" required placeholder="e.g., Midnight Letters in Kigali" class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian-950 border border-white/15 text-sm text-white focus:outline-none focus:border-amberGlow-400" />
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-stone-300 mb-1">Genre *</label>
+            <select id="fieldGenre" class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian-950 border border-white/15 text-sm text-white focus:outline-none focus:border-amberGlow-400">
+              <option value="Romance">Romance</option>
+              <option value="Drama">Drama</option>
+              <option value="Slice of Life">Slice of Life</option>
+              <option value="Mystery">Mystery</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-stone-300 mb-1">Book Cover Gradient</label>
+          <select id="fieldTheme" class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian-950 border border-white/15 text-sm text-white focus:outline-none focus:border-amberGlow-400">
+            <option value="from-amber-600 via-rose-700 to-purple-950">Sunset Amber & Rose</option>
+            <option value="from-indigo-600 via-purple-800 to-slate-950">Midnight Starlight</option>
+            <option value="from-emerald-600 via-teal-800 to-stone-950">Misty Hills Emerald</option>
+            <option value="from-rose-500 via-pink-700 to-obsidian-950">Velvet Cherry Blossom</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-stone-300 mb-1">Short Hook / Teaser Summary *</label>
+          <input type="text" id="fieldBlurb" required placeholder="A catchy 1-sentence hook that makes people want to read..." class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian-950 border border-white/15 text-sm text-white focus:outline-none focus:border-amberGlow-400" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-amberGlow-300 mb-1">Opening Chapter / Preview * (Shown even after 7-day trial ends)</label>
+          <textarea id="fieldPreview" required rows="4" placeholder="Paste the beginning of your story here..." class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian-950 border border-white/15 text-sm text-white font-serif focus:outline-none focus:border-amberGlow-400"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-emerald-300 mb-1">Full Story Continuation * (Unlocked during 7-day trial & for VIP subscribers)</label>
+          <textarea id="fieldFullContent" required rows="6" placeholder="Paste the rest of your story and ending here..." class="w-full px-3.5 py-2.5 rounded-xl bg-obsidian-950 border border-white/15 text-sm text-white font-serif focus:outline-none focus:border-amberGlow-400"></textarea>
+        </div>
+
+        <div class="pt-2 flex items-center justify-end gap-3">
+          <button type="button" onclick="closeEditorModal()" class="px-4 py-2.5 rounded-xl bg-white/5 text-sm text-stone-300">Cancel</button>
+          <button type="submit" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amberGlow-400 to-roseGold-400 text-obsidian-950 font-bold text-sm shadow-lg">
+            Publish Story
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================= -->
+  <!-- JAVASCRIPT LOGIC                                          -->
+  <!-- ========================================================= -->
+  <script>
+    // Default Stories for Joana's Ink
+    const DEFAULT_STORIES = [
+      {
+        id: 'joana-story-1',
+        title: 'Last Bus from Kimironko',
+        genre: 'Romance',
+        theme: 'from-amber-600 via-rose-700 to-purple-950',
+        blurb: 'Two students keep sharing the 8:15 PM bus in the rain, trading playlists before ever learning each other’s names.',
+        preview: `Every Tuesday and Thursday, the sky above Kimironko waited until exactly 8:10 PM to break open. By the time I reached the bus stop with my canvas tote soaked through, the yellow streetlights were already melting into puddles on the tarmac.\n\nHe was always standing under the narrow tin awning of the closed stationery shop, one wired earphone dangling against his collar, sketching furiously in a pocket notebook.\n\n"You're going to ruin your pages," I told him on the third Thursday, shaking water off my umbrella.\n\nHe looked up, startled, with ink smudged across his thumb and a slow, crooked smile that made the cold October air feel suddenly warm. "Good thing I draw in waterproof pen," he replied, holding out the spare earbud. "Want to listen while we wait?"`,
+        fullContent: `I took the earbud. A soft acoustic guitar melody drifted into my ear—something gentle, half-remembered, like Sunday afternoons before exams.\n\nFor the next four weeks, we never exchanged numbers. We didn't even exchange names. We had an unspoken rule: from 8:15 PM until my stop near Kacyiru, the bus belonged to our tiny universe. He drew portraits of sleepy commuters; I read him lines from the stories I was writing on my phone.\n\nThen came the final week of the semester. The rain had stopped, replaced by crisp December stars. When I boarded the 8:15 bus, his corner by the window was empty.\n\nMy chest tightened in a way I hadn't prepared for. Sitting on the vinyl seat where he usually leaned was a small folded square of thick sketchbook paper.\n\nInside was a drawing of me—laughing, holding my battered umbrella—and underneath, written in his neat, slanted handwriting: "My name is Daniel. I'm terrible at goodbyes, so meet me at the coffee stand tomorrow at four? — 078X XXX XXX."`
+      },
+      {
+        id: 'joana-story-2',
+        title: 'The Notebook Under Desk 14',
+        genre: 'Mystery',
+        theme: 'from-indigo-600 via-purple-800 to-slate-950',
+        blurb: 'During evening prep at school, Amina finds a decade-old diary hidden inside a loose wooden desk drawer.',
+        preview: `Prep hour in Senior Six was supposed to be silent, save for the scratch of pens and the distant hum of crickets outside the library windows. I only reached under Desk 14 because my ruler had slipped through a crack in the floorboards.\n\nInstead of wood, my fingers brushed against stitched leather.\n\nWedged tightly beneath the desk frame was a thin, maroon notebook dated November 2016. On the first page, written in urgent blue ink, were seven words: "If you find this before Founders' Day, check behind the chapel bell."`,
+        fullContent: `My heart hammered against my ribs as I glanced toward the prefect at the front of the room. She was absorbed in her physics textbook.\n\nFlipping carefully through the yellowed pages, I realized the notebook belonged to a former head girl named Clara. She hadn't written about exams or school gossip—she had mapped out a series of clues left by the school's original 1970s debate club, including the location of a time capsule buried before the old wing was renovated.\n\nThe next evening at dusk, armed with a flashlight and my best friend Keza, I slipped behind the stone chapel. Behind the loose bricks beneath the bronze bell sat a rusted biscuit tin wrapped in oiled cloth.\n\nInside weren't jewels or money, but forty Polaroid photographs of students from 1978, handwritten letters to future girls of the school, and a silver fountain pen engraved with the motto: "Write what others are afraid to say."`
+      },
+      {
+        id: 'joana-story-3',
+        title: 'Eighteen & Unwritten',
+        genre: 'Slice of Life',
+        theme: 'from-emerald-600 via-teal-800 to-stone-950',
+        blurb: 'Turning eighteen with a notebook full of half-finished dreams, loud best friends, and the courage to hit publish.',
+        preview: `"Okay, nobody panic, but the rain just knocked out the Wi-Fi," Teta announced from my bedroom doorway, holding two mugs of spiced tea.\n\nIt was the night before my eighteenth birthday, and my desk was buried under loose pages of character sketches, crossed-out endings, and sticky notes.\n\n"What if nobody reads what I write?" I admitted quietly, staring at the blinking cursor on my screen. Teta set a mug beside my keyboard and smiled. "What if thousands of people were waiting for someone exactly like you to write it?"`,
+        fullContent: `That night, using my phone's hotspot while thunder rolled over the hills, I pressed publish on my very first chapter.\n\nAt first, there were only three views—me, Teta, and my cousin. By morning, there were forty. By the end of the week, messages were pouring in from girls across the city asking when Part Two would drop.\n\nTurning eighteen didn't suddenly hand me all the answers to life. Still, every time I open a blank page now, I remember that stories don't need permission to travel far—they just need to be brave enough to begin.`
+      }
+    ];
+
+    // Persistent Settings & State
+    const DEFAULT_SETTINGS = {
+      subPrice: 2000,
+      currency: 'RWF',
+      trialDays: 7,
+      ownerPin: '2008',
+      paymentUrl: ''
+    };
+
+    let stories = JSON.parse(localStorage.getItem('joana_stories_v2')) || DEFAULT_STORIES;
+    let settings = JSON.parse(localStorage.getItem('joana_settings_v2')) || DEFAULT_SETTINGS;
+    let isDay8Simulated = JSON.parse(localStorage.getItem('joana_day8_sim')) || false;
+    let isVipSubscribed = JSON.parse(localStorage.getItem('joana_vip_sub')) || false;
+    let isOwnerUnlocked = false;
+    let activeGenre = 'All';
+    let readerPaperWarm = false;
+
+    function saveAll() {
+      localStorage.setItem('joana_stories_v2', JSON.stringify(stories));
+      localStorage.setItem('joana_settings_v2', JSON.stringify(settings));
+      localStorage.setItem('joana_day8_sim', JSON.stringify(isDay8Simulated));
+      localStorage.setItem('joana_vip_sub', JSON.stringify(isVipSubscribed));
+    }
+
+    function formatPrice(amount, currency) {
+      const num = Number(amount) || 0;
+      return currency === 'USD' ? `$${num.toFixed(2)}` : `${num.toLocaleString()} RWF`;
+    }
+
+    // Toast Notification (No alert())
+    function showToast(msg, type = 'success') {
+      const container = document.getElementById('toastContainer');
+      const el = document.createElement('div');
+      const border = type === 'error' ? 'border-rose-500/50 text-rose-200' : 'border-amberGlow-400/50 text-amberGlow-200';
+      el.className = `pointer-events-auto px-4 py-3 rounded-2xl bg-obsidian-900/95 backdrop-blur-md border ${border} shadow-2xl text-xs sm:text-sm font-medium flex items-center gap-2 transition-all duration-300`;
+      el.innerHTML = `<span>${type === 'error' ? '⚠️' : '✨'}</span><span>${msg}</span>`;
+      container.appendChild(el);
+      setTimeout(() => {
+        el.style.opacity = '0';
+        setTimeout(() => el.remove(), 300);
+      }, 3200);
+    }
+
+    // Check if visitor currently has full reading access
+    function hasFullAccess() {
+      if (isOwnerUnlocked) return true;
+      if (isVipSubscribed) return true;
+      return !isDay8Simulated; // During 7-day trial, full access is ON!
+    }
+
+    // Update all UI price tags and trial banners
+    function syncUIWithState() {
+      const priceText = formatPrice(settings.subPrice, settings.currency);
+      document.getElementById('headerPriceTag').textContent = `${priceText}/mo`;
+      document.getElementById('heroCardPrice').textContent = priceText;
+      document.getElementById('modalSubPriceDisplay').innerHTML = `${priceText} <span class="text-xs font-normal text-stone-400">/ month</span>`;
+      document.getElementById('paywallPriceLabel').textContent = `${priceText} / month`;
+      document.getElementById('ownerPriceReminder').textContent = `${priceText}/mo`;
+      document.getElementById('heroTrialDaysText').textContent = `${settings.trialDays}-Day Welcome Pass`;
+      document.getElementById('cardTrialDays').textContent = settings.trialDays;
+
+      const bannerText = document.getElementById('trialBannerText');
+      const badgeIcon = document.getElementById('trialBadgeIcon');
+      const toggleBtn = document.getElementById('btnToggleDay8');
+      const cardBadge = document.getElementById('cardAccessStatusBadge');
+
+      if (isVipSubscribed) {
+        badgeIcon.className = 'inline-flex items-center justify-center w-5 h-5 rounded-full bg-amberGlow-400/20 text-amberGlow-300 font-bold';
+        badgeIcon.textContent = '👑';
+        bannerText.innerHTML = `<strong class="text-amberGlow-300">VIP Subscriber Active!</strong> You have unlimited access to all K&amp;J Ink stories.`;
+        toggleBtn.textContent = 'Reset Demo State';
+        cardBadge.textContent = 'VIP Active';
+        cardBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-amberGlow-400/20 text-amberGlow-300';
+      } else if (isDay8Simulated) {
+        badgeIcon.className = 'inline-flex items-center justify-center w-5 h-5 rounded-full bg-rose-500/20 text-rose-300 font-bold';
+        badgeIcon.textContent = '🔒';
+        bannerText.innerHTML = `<strong class="text-roseGold-300">Day ${Number(settings.trialDays) + 1} (Trial Ended):</strong> Subscribe for <strong class="text-white">${priceText}/mo</strong> to unlock full chapters.`;
+        toggleBtn.textContent = 'Back to Day 1 (Free Trial)';
+        cardBadge.textContent = 'Trial Ended';
+        cardBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300';
+      } else {
+        badgeIcon.className = 'inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold';
+        badgeIcon.textContent = '✦';
+        bannerText.innerHTML = `Welcome! Enjoy <strong class="text-amberGlow-300">${settings.trialDays} Days Free Reading</strong> — all full stories unlocked!`;
+        toggleBtn.textContent = `Simulate Day ${Number(settings.trialDays) + 1} (Trial Ended)`;
+        cardBadge.textContent = 'Trial Active';
+        cardBadge.className = 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300';
+      }
+
+      renderStorefront();
+    }
+
+    // Demo Simulator Toggle (Day 1 Free Trial <-> Day 8 Paywall)
+    function toggleTrialSimulation() {
+      if (isVipSubscribed) {
+        isVipSubscribed = false;
+        isDay8Simulated = false;
+        showToast('Demo reset back to Day 1 Free Trial!');
+      } else {
+        isDay8Simulated = !isDay8Simulated;
+        showToast(isDay8Simulated
+          ? `Simulating Day ${Number(settings.trialDays) + 1}: Free trial ended! Stories now show the monthly subscription paywall.`
+          : 'Back to Day 1: All stories unlocked for free trial!'
+        );
+      }
+      saveAll();
+      syncUIWithState();
+    }
+
+    // Render Genre Filter Pills
+    function renderGenres() {
+      const genres = ['All', 'Romance', 'Drama', 'Slice of Life', 'Mystery'];
+      document.getElementById('genrePills').innerHTML = genres.map(g => {
+        const active = activeGenre === g;
+        return `<button onclick="activeGenre='${g}'; renderStorefront();" class="px-3.5 py-1.5 rounded-full text-xs whitespace-nowrap transition ${active ? 'bg-amberGlow-400 text-obsidian-950 font-semibold shadow' : 'bg-obsidian-900 text-stone-300 hover:bg-obsidian-800 border border-white/10'}">${g}</button>`;
+      }).join('');
+    }
+
+    // Render Reader Storefront Cards
+    function renderStorefront() {
+      renderGenres();
+      const query = (document.getElementById('searchInput').value || '').toLowerCase();
+      const grid = document.getElementById('storiesGrid');
+      const unlocked = hasFullAccess();
+
+      const filtered = stories.filter(s => {
+        const matchText = s.title.toLowerCase().includes(query) || s.blurb.toLowerCase().includes(query);
+        if (!matchText) return false;
+        return activeGenre === 'All' || s.genre === activeGenre;
+      });
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="col-span-full text-center py-12 bg-obsidian-900/60 border border-white/10 rounded-3xl text-stone-400 text-sm">No stories match your search yet.</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(story => {
+        const words = (story.preview + ' ' + story.fullContent).split(/\s+/).length;
+        const mins = Math.max(2, Math.ceil(words / 180));
+
+        return `
+          <article class="group bg-obsidian-900 border border-white/10 hover:border-amberGlow-400/40 rounded-3xl overflow-hidden flex flex-col justify-between transition duration-300 hover:-translate-y-1">
+            <div>
+              <div class="relative h-44 bg-gradient-to-br ${story.theme} p-5 flex flex-col justify-between book-shadow">
+                <div class="flex items-center justify-between">
+                  <span class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-black/35 backdrop-blur-md text-white border border-white/15">
+                    ${story.genre}
+                  </span>
+                  ${unlocked
+                    ? `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-400 text-obsidian-950">Full Access</span>`
+                    : `<span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-obsidian-950/80 text-amberGlow-300 border border-amberGlow-400/30">VIP Story</span>`
+                  }
+                </div>
+                <div>
+                  <h3 class="font-serif text-xl font-bold text-white leading-snug drop-shadow">${story.title}</h3>
+                  <p class="text-[11px] text-white/80 mt-1">K&amp;J Ink Original • ~${mins} min read</p>
+                </div>
+              </div>
+              <div class="p-5">
+                <p class="text-sm text-stone-300 leading-relaxed line-clamp-3">${story.blurb}</p>
+              </div>
+            </div>
+
+            <div class="px-5 pb-5 pt-1">
+              <button onclick="openReader('${story.id}')" class="w-full py-2.5 px-4 rounded-xl ${unlocked ? 'bg-amberGlow-400 hover:bg-amberGlow-300 text-obsidian-950 font-bold' : 'bg-white/10 hover:bg-white/15 text-white font-semibold border border-white/10'} text-xs sm:text-sm transition">
+                ${unlocked ? 'Read Full Story' : 'Read Preview & Unlock'}
+              </button>
+            </div>
+          </article>
+        `;
+      }).join('');
+    }
+
+    // Reader Modal Logic
+    function openReader(storyId) {
+      const story = stories.find(s => s.id === storyId);
+      if (!story) return;
+
+      const unlocked = hasFullAccess();
+      document.getElementById('readerGenreBadge').textContent = story.genre;
+      const accessBadge = document.getElementById('readerAccessBadge');
+      accessBadge.textContent = unlocked ? 'Full Story Unlocked' : 'Free Preview Only';
+      accessBadge.className = unlocked
+        ? 'px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/20 text-emerald-300'
+        : 'px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-500/20 text-rose-300';
+
+      document.getElementById('readerTitle').textContent = story.title;
+      const textEl = document.getElementById('readerText');
+      const paywall = document.getElementById('readerPaywallBox');
+
+      if (unlocked) {
+        textEl.textContent = story.preview + '\n\n' + story.fullContent;
+        paywall.classList.add('hidden');
+      } else {
+        textEl.textContent = story.preview;
+        paywall.classList.remove('hidden');
+      }
+
+      document.getElementById('readerModal').classList.remove('hidden');
+      document.getElementById('readerBodyContainer').scrollTop = 0;
+    }
+
+    function closeReaderModal() {
+      document.getElementById('readerModal').classList.add('hidden');
+    }
+
+    function toggleReaderPaper() {
+      readerPaperWarm = !readerPaperWarm;
+      const body = document.getElementById('readerBodyContainer');
+      if (readerPaperWarm) {
+        body.classList.remove('bg-obsidian-900', 'text-stone-200');
+        body.classList.add('bg-[#f7f1e3]', 'text-stone-900');
+      } else {
+        body.classList.add('bg-obsidian-900', 'text-stone-200');
+        body.classList.remove('bg-[#f7f1e3]', 'text-stone-900');
+      }
+    }
+
+    // Subscription Checkout Modal
+    function openSubscriptionModal() {
+      const extBtn = document.getElementById('externalPaymentLinkBtn');
+      if (settings.paymentUrl && settings.paymentUrl.trim() !== '') {
+        extBtn.href = settings.paymentUrl.trim();
+        extBtn.classList.remove('hidden');
+      } else {
+        extBtn.classList.add('hidden');
+      }
+      document.getElementById('subscriptionModal').classList.remove('hidden');
+    }
+
+    function closeSubscriptionModal() {
+      document.getElementById('subscriptionModal').classList.add('hidden');
+    }
+
+    function selectSubPayMethod(method) {
+      document.querySelectorAll('.sub-pay-btn').forEach(b => {
+        b.classList.remove('border-amberGlow-400', 'bg-amberGlow-400/10');
+        b.classList.add('border-white/10', 'bg-obsidian-800');
+      });
+      const active = document.getElementById(`subPay-${method}`);
+      active.classList.remove('border-white/10', 'bg-obsidian-800');
+      active.classList.add('border-amberGlow-400', 'bg-amberGlow-400/10');
+
+      const label = document.getElementById('subPayLabel');
+      const input = document.getElementById('subPayInput');
+      if (method === 'mtn') {
+        label.textContent = 'MTN Mobile Money Number';
+        input.placeholder = 'e.g., 0788 123 456';
+      } else if (method === 'airtel') {
+        label.textContent = 'Airtel Money Number';
+        input.placeholder = 'e.g., 0733 123 456';
+      } else {
+        label.textContent = 'Card Number (Demo Checkout)';
+        input.placeholder = '4242 •••• •••• 4242';
+      }
+    }
+
+    function activateMonthlySubscription() {
+      const val = document.getElementById('subPayInput').value.trim();
+      if (!val) {
+        showToast('Please enter your phone number or card to activate VIP access.', 'error');
+        return;
+      }
+      isVipSubscribed = true;
+      saveAll();
+      closeSubscriptionModal();
+      syncUIWithState();
+      showToast('Welcome to the K&J Ink VIP Club! All stories are now unlocked.');
+    }
+
+    // Secret Owner Login & Studio Controls
+    function openOwnerLoginModal() {
+      if (isOwnerUnlocked) {
+        toggleOwnerStudio();
+        return;
+      }
+      document.getElementById('ownerPinInput').value = '';
+      document.getElementById('ownerLoginModal').classList.remove('hidden');
+    }
+
+    function closeOwnerLoginModal() {
+      document.getElementById('ownerLoginModal').classList.add('hidden');
+    }
+
+    function verifyOwnerPin(event) {
+      event.preventDefault();
+      const entered = document.getElementById('ownerPinInput').value.trim();
+      if (entered === String(settings.ownerPin)) {
+        isOwnerUnlocked = true;
+        closeOwnerLoginModal();
+        document.getElementById('ownerStudioHeaderBtn').classList.remove('hidden');
+        showOwnerStudio();
+        showToast('Welcome back, KWIZERA Joana!');
+      } else {
+        showToast('Wrong PIN! Hint: Default PIN is 2008.', 'error');
+      }
+    }
+
+    function showOwnerStudio() {
+      document.getElementById('readerView').classList.add('hidden');
+      document.getElementById('authorView').classList.remove('hidden');
+      document.getElementById('ownerStudioHeaderLabel').textContent = 'View Storefront';
+
+      // Populate Owner Settings Form
+      document.getElementById('settingSubPrice').value = settings.subPrice;
+      document.getElementById('settingCurrency').value = settings.currency;
+      document.getElementById('settingTrialDays').value = settings.trialDays;
+      document.getElementById('settingOwnerPin').value = settings.ownerPin;
+      document.getElementById('settingPaymentUrl').value = settings.paymentUrl || '';
+
+      generatePromoCaption();
+      renderOwnerStories();
+    }
+
+    function switchToStorefront(event) {
+      if (event) event.preventDefault();
+      document.getElementById('authorView').classList.add('hidden');
+      document.getElementById('readerView').classList.remove('hidden');
+      if (isOwnerUnlocked) {
+        document.getElementById('ownerStudioHeaderLabel').textContent = 'Owner Studio';
+      }
+      syncUIWithState();
+    }
+
+    function toggleOwnerStudio() {
+      const authorHidden = document.getElementById('authorView').classList.contains('hidden');
+      if (authorHidden) {
+        showOwnerStudio();
+      } else {
+        switchToStorefront();
+      }
+    }
+
+    function lockOwnerStudio() {
+      isOwnerUnlocked = false;
+      document.getElementById('ownerStudioHeaderBtn').classList.add('hidden');
+      switchToStorefront();
+      showToast('Admin locked. Viewing site as a regular reader.');
+    }
+
+    function savePricingSettings(event) {
+      event.preventDefault();
+      settings.subPrice = Number(document.getElementById('settingSubPrice').value) || 2000;
+      settings.currency = document.getElementById('settingCurrency').value;
+      settings.trialDays = Number(document.getElementById('settingTrialDays').value) || 7;
+      settings.ownerPin = document.getElementById('settingOwnerPin').value.trim() || '2008';
+      settings.paymentUrl = document.getElementById('settingPaymentUrl').value.trim();
+
+      saveAll();
+      syncUIWithState();
+      showToast(`Subscription updated to ${formatPrice(settings.subPrice, settings.currency)}/month!`);
+    }
+
+    // Owner Story CRUD
+    function renderOwnerStories() {
+      document.getElementById('ownerStoryCount').textContent = stories.length;
+      const list = document.getElementById('authorStoriesList');
+      list.innerHTML = stories.map(s => `
+        <div class="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-white/[0.02] transition">
+          <div class="flex items-start gap-3.5">
+            <div class="w-12 h-16 rounded-xl bg-gradient-to-br ${s.theme} shrink-0 shadow"></div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="font-serif font-bold text-white text-base">${s.title}</h4>
+                <span class="px-2 py-0.5 rounded-full text-[10px] bg-white/10 text-stone-300">${s.genre}</span>
+              </div>
+              <p class="text-xs text-stone-400 mt-1 line-clamp-1">${s.blurb}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 self-end sm:self-center">
+            <button onclick="openEditorModal('${s.id}')" class="px-3 py-1.5 rounded-lg bg-amberGlow-400/15 text-xs text-amberGlow-300 border border-amberGlow-400/30">Edit</button>
+            <button onclick="deleteStory('${s.id}')" class="px-3 py-1.5 rounded-lg bg-rose-500/15 text-xs text-rose-300 border border-rose-500/30">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function openEditorModal(storyId = null) {
+      document.getElementById('storyForm').reset();
+      if (storyId) {
+        const s = stories.find(x => x.id === storyId);
+        if (!s) return;
+        document.getElementById('editorModalTitle').textContent = 'Edit Story';
+        document.getElementById('editStoryId').value = s.id;
+        document.getElementById('fieldTitle').value = s.title;
+        document.getElementById('fieldGenre').value = s.genre;
+        document.getElementById('fieldTheme').value = s.theme;
+        document.getElementById('fieldBlurb').value = s.blurb;
+        document.getElementById('fieldPreview').value = s.preview;
+        document.getElementById('fieldFullContent').value = s.fullContent;
+      } else {
+        document.getElementById('editorModalTitle').textContent = 'Write a New Story';
+        document.getElementById('editStoryId').value = '';
+      }
+      document.getElementById('editorModal').classList.remove('hidden');
+    }
+
+    function closeEditorModal() {
+      document.getElementById('editorModal').classList.add('hidden');
+    }
+
+    function saveStory(event) {
+      event.preventDefault();
+      const id = document.getElementById('editStoryId').value;
+      const data = {
+        title: document.getElementById('fieldTitle').value.trim(),
+        genre: document.getElementById('fieldGenre').value,
+        theme: document.getElementById('fieldTheme').value,
+        blurb: document.getElementById('fieldBlurb').value.trim(),
+        preview: document.getElementById('fieldPreview').value.trim(),
+        fullContent: document.getElementById('fieldFullContent').value.trim()
+      };
+
+      if (id) {
+        const idx = stories.findIndex(x => x.id === id);
+        if (idx !== -1) stories[idx] = { ...stories[idx], ...data };
+        showToast('Story updated!');
+      } else {
+        stories.unshift({ id: 'kj-story-' + Date.now(), ...data });
+        showToast('New story published to K&J Ink!');
+      }
+
+      saveAll();
+      closeEditorModal();
+      renderOwnerStories();
+      renderStorefront();
+    }
+
+    function deleteStory(storyId) {
+      stories = stories.filter(s => s.id !== storyId);
+      saveAll();
+      renderOwnerStories();
+      renderStorefront();
+      showToast('Story deleted.');
+    }
+
+    // Grow Famous Social Toolkit Helpers
+    let promoIndex = 0;
+
+    function generatePromoCaption() {
+      const latestTitle = stories[0] ? stories[0].title : 'my newest story';
+      const hooks = [
+        `POV: You found a secret story page posting late-night romance & mystery chapters you can read FREE for ${settings.trialDays} days ✨ Read "${latestTitle}" now — link in bio! #BookTok #Kigali #ShortStories`,
+        `New story alert! 🚨 "${latestTitle}" just dropped on K&J Ink. Read every story free for your first ${settings.trialDays} days! Link in bio 📖✨`,
+        `Need a cozy late-night read? Check out "${latestTitle}" on K&J Ink — first ${settings.trialDays} days 100% FREE! 🌙✨`
+      ];
+      document.getElementById('promoCaptionBox').value = hooks[promoIndex % hooks.length];
+      promoIndex++;
+    }
+
+    function copyTextValue(elementId, successMsg) {
+      const el = document.getElementById(elementId);
+      el.select();
+      el.setSelectionRange(0, 99999);
+      document.execCommand('copy');
+      showToast(successMsg);
+    }
+
+    function shareSiteLink() {
+      const url = window.location.href;
+      const temp = document.createElement('input');
+      temp.value = url;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand('copy');
+      document.body.removeChild(temp);
+      showToast('Website link copied! Share it on WhatsApp or Instagram.');
+    }
+
+    function shareToWhatsApp() {
+      const text = encodeURIComponent(document.getElementById('promoCaptionBox').value + ' ' + window.location.href);
+      window.open(`https://wa.me/?text=${text}`, '_blank');
+    }
+
+    // Export standalone HTML with latest stories baked in
+    function exportUpdatedWebsite() {
+      const htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      const blob = new Blob([htmlContent], { type: 'text/html' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'kj-ink.html';
+      a.click();
+      showToast('Downloaded kj-ink.html! Upload this file to Tiiny.host or Netlify.');
+    }
+
+    // Quick Guide Modal
+    function openQuickGuideModal() {
+      document.getElementById('quickGuideModal').classList.remove('hidden');
+    }
+    function closeQuickGuideModal() {
+      document.getElementById('quickGuideModal').classList.add('hidden');
+      localStorage.setItem('joana_guide_seen', 'true');
+    }
+
+    // Initialize on Page Load
+    window.addEventListener('DOMContentLoaded', () => {
+      syncUIWithState();
+      if (!localStorage.getItem('joana_guide_seen')) {
+        openQuickGuideModal();
+      }
+    });
+  </script>
+</body>
+</html>
